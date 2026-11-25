@@ -3,11 +3,12 @@ import { WHATSAPP_NUMBER, waLink } from "../config";
 import { useI18n } from "../i18n";
 
 const EMPTY = { name: "", phone: "", city: "", address: "" };
+// [key, input type, autocomplete hint] — the hints let phones autofill the form.
 const FIELDS = [
-  ["name", "text"],
-  ["phone", "tel"],
-  ["city", "text"],
-  ["address", "text"],
+  ["name", "text", "name"],
+  ["phone", "tel", "tel"],
+  ["city", "text", "address-level2"],
+  ["address", "text", "street-address"],
 ];
 
 export default function CheckoutModal({ open, cart, onClose, onPlaced }) {
@@ -60,12 +61,16 @@ export default function CheckoutModal({ open, cart, onClose, onPlaced }) {
         <h3 id="checkoutTitle">{c.title}</h3>
         <p className="muted">{c.lead}</p>
         <form onSubmit={submit}>
-          {FIELDS.map(([key, type]) => (
+          {FIELDS.map(([key, type, autoComplete]) => (
             <div className="field" key={key}>
               <label htmlFor={`o-${key}`}>{c[key]}</label>
               <input
                 id={`o-${key}`}
+                name={key}
                 type={type}
+                autoComplete={autoComplete}
+                inputMode={type === "tel" ? "tel" : undefined}
+                enterKeyHint={key === "address" ? "done" : "next"}
                 dir={type === "tel" ? "ltr" : undefined}
                 required
                 value={form[key]}

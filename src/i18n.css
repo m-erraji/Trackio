@@ -114,3 +114,6 @@ html[lang="ar"] .product__name { font-family: "Manrope", var(--font-ar-title); }
 /* Elements waiting to slide in from the side must never widen the page
    (would allow sideways scrolling on phones, and shift RTL pages). */
 main, footer { overflow-x: clip; }
+
+/* Values that pick their own direction (dir="auto") still align with the page. */
+[dir="rtl"] .spec-group dd[dir="auto"] { text-align: right; }

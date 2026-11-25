@@ -1,0 +1,169 @@
+/* =========================================================
+   Trackio — mobile & touch
+   Loaded last. Covers: header fit, touch targets (≥ 44 px),
+   no iOS zoom on form fields, scroll locking, sticky buy bar,
+   swipeable gallery, notch-safe fixed elements, sticky-hover
+   fixes for touch screens and tighter phone typography.
+   ========================================================= */
+
+/* ---------- Everywhere ---------- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; }
+a, button, summary, .lang-switch__item { touch-action: manipulation; } /* no 300 ms tap delay */
+html.no-scroll, html.menu-open { overflow: hidden; }
+.drawer__body, .modal__card, .nav { overscroll-behavior: contain; }
+
+/* The closed cart drawer sat just off-screen and its shadow leaked onto the page edge. */
+.drawer { visibility: hidden; transition: transform .5s var(--ease-out), visibility 0s .5s; }
+.drawer.open { visibility: visible; transition: transform .5s var(--ease-out), visibility 0s; }
+.drawer:not(.open), [dir="rtl"] .drawer:not(.open) { box-shadow: none; }
+
+/* Language switch: in the header on desktop, inside the menu on phones. */
+.nav__lang { display: none; }
+
+/* Mobile-only pieces are hidden on larger screens. */
+.buybar, .gallery__dots { display: none; }
+
+/* iPhone notch / home bar safe areas */
+.wa-fab { bottom: calc(22px + env(safe-area-inset-bottom)); transition: background .2s, transform .3s var(--ease-spring), bottom .35s var(--ease-out); }
+.toast { bottom: calc(24px + env(safe-area-inset-bottom)); }
+.drawer__foot { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+
+/* ---------- Touch screens: no "stuck" hover effects after a tap ---------- */
+@media (hover: none) {
+  .feature:hover, .product:hover, .pdp__features li:hover, .contact__card:hover {
+    transform: none; box-shadow: none; border-color: var(--c-line);
+  }
+  .product.featured:hover { border-color: var(--c-accent-line); }
+  .button:hover { transform: none; box-shadow: none; }
+  .button::after { display: none; }
+  .button:hover svg, [dir="rtl"] .button:hover svg:not(.icon-arrow) { transform: none; }
+  [dir="rtl"] .button:hover .icon-arrow { transform: scaleX(-1); }
+  .product:hover .product__img, [dir="rtl"] .product:hover .product__img,
+  .gallery__main:hover img { transform: none; }
+  .feature:hover .feature__icon, .pdp__features li:hover .pdp__feature-icon { transform: none; }
+  .logo:hover .logo__mark, .icon-btn:hover, .wa-fab:hover { transform: none; }
+  .faq summary:hover, [dir="rtl"] .faq summary:hover { padding-left: 0; padding-right: 0; color: inherit; }
+  .contact__list > div:hover, [dir="rtl"] .contact__list > div:hover { padding-left: 0; padding-right: 0; }
+  .spec-group dl > div:hover { background: none; padding-inline: 0; }
+  .cart-btn:hover svg, .header__phone:hover svg { animation: none; }
+  /* …but keep a clear "pressed" feedback */
+  .button:active { transform: scale(.97); }
+  .product:active { transform: scale(.99); }
+}
+
+/* ---------- Tablets & phones ---------- */
+@media (max-width: 760px) {
+  /* Header: logo · cart · menu only — the language switch moves into the menu */
+  .header__lang { display: none; }
+  .header__actions { gap: 10px; }
+  .cart-btn, .menu-toggle { width: 44px; height: 44px; }
+  .nav { box-shadow: 0 18px 30px #2a232614; max-height: calc(100dvh - 76px); overflow-y: auto; }
+  .nav a { font-size: 16px; }
+  .nav__lang { display: inline-flex; align-self: flex-start; margin-top: 14px; }
+  .nav__lang .lang-switch__item { min-width: 48px; height: 40px; font-size: 14px; }
+  .nav__lang .lang-switch__item[lang="ar"] { font-size: 17px; }
+
+  /* Comfortable touch targets (≥ 44 px) */
+  .lang-switch__item { min-width: 44px; height: 40px; }
+  .icon-btn { width: 44px; height: 44px; }
+  .qty button { min-width: 40px; min-height: 40px; }
+  .product__more { padding-block: 10px; }
+  .hero__discover { padding-block: 8px; }
+  .footer__nav a { padding-block: 8px; }
+  .breadcrumb a { padding-block: 6px; }
+  .pdp__docs a { padding-block: 6px; }
+
+  /* Form fields ≥ 16 px so iPhones don't zoom in when typing */
+  .field input { font-size: 16px; padding-block: 13px; }
+
+  /* Hero: keep the "Anti-theft" card from covering the map caption */
+  .hero__actions .button { flex: 1 1 140px; }
+  .hero__image-caption { bottom: 96px; inset-inline: 22px; }
+  .hero__image-caption p { font-size: 18px; }
+  .hero__badge { bottom: -26px; left: 12px; right: 12px; max-width: none; padding: 14px 16px; }
+  [dir="rtl"] .hero__badge { left: 12px; right: 12px; }
+  .hero__live { top: 16px; right: 16px; }
+  [dir="rtl"] .hero__live { right: auto; left: 16px; }
+
+  /* Approach mock-up: smaller seal so it doesn't sit on the phone */
+  .approach__seal { width: 92px; height: 92px; top: 14px; right: 14px; }
+  [dir="rtl"] .approach__seal { right: auto; left: 14px; }
+
+  /* Cart & checkout fill the screen nicely */
+  .modal { padding: 12px; align-items: end; }
+  .modal__card { padding: 26px 22px calc(22px + env(safe-area-inset-bottom)); max-height: 92dvh; border-radius: 14px; }
+
+  /* Product page */
+  .pdp { padding: 16px 0 64px; }
+  .breadcrumb { margin-bottom: 18px; }
+  .gallery__main { touch-action: pan-y; user-select: none; }
+  .gallery__dots {
+    position: absolute; left: 0; right: 0; bottom: 12px; z-index: 1;
+    display: flex; justify-content: center; gap: 6px; pointer-events: none;
+  }
+  .gallery__dots span { width: 6px; height: 6px; border-radius: 3px; background: #2a232633; transition: width .3s var(--ease-out), background .3s; }
+  .gallery__dots span.active { width: 18px; background: var(--c-accent); }
+  .gallery__thumbs { gap: 8px; }
+  .pdp__price { margin: 18px 0 16px; padding: 14px 0; }
+  .pdp__price strong { font-size: 28px; }
+  .pdp__actions .button { flex: 1 1 100%; }
+  .pdp__features li { padding: 18px; }
+
+  /* Sticky buy bar — slides up once the main buttons scroll away */
+  .buybar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+    background: rgba(250, 249, 246, .96); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--c-line); box-shadow: 0 -8px 24px #2a23260f;
+    transform: translateY(110%); transition: transform .35s var(--ease-out);
+  }
+  .buybar.show { transform: none; }
+  .buybar img { width: 44px; height: 44px; flex-shrink: 0; object-fit: contain; background: #fff; border: 1px solid var(--c-line); border-radius: 6px; }
+  .buybar__info { flex: 1; min-width: 0; display: grid; line-height: 1.3; }
+  .buybar__info strong { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .buybar__info span { color: var(--c-accent); font-size: 13px; font-weight: 600; }
+  .buybar .button { min-height: 44px; padding: 10px 16px; white-space: nowrap; }
+  html.has-buybar .wa-fab { bottom: calc(84px + env(safe-area-inset-bottom)); }
+
+  /* Messages drop in from the top on phones, so they never cover the cart / order buttons */
+  .toast {
+    top: calc(12px + env(safe-area-inset-top)); bottom: auto;
+    width: max-content; max-width: calc(100% - 32px); text-align: center;
+    transform: translate(-50%, calc(-100% - 40px));
+  }
+  .toast.show { transform: translate(-50%, 0); }
+
+  /* Footer */
+  .footer__bottom { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 480px) {
+  :root { --gutter: 20px; }
+  h1 { font-size: 35px; letter-spacing: -1.4px; }
+  h2 { font-size: 28px; letter-spacing: -1px; }
+  .pdp__title { font-size: 32px; letter-spacing: -1px; }
+  html[lang="ar"] h1 { font-size: 33px; }
+  html[lang="ar"] h2 { font-size: 26px; }
+
+  .section { padding-block: 60px; }
+  .hero { padding-block: 24px 64px; }
+  .hero__intro { font-size: 15px; margin-block: 20px 24px; }
+  .hero__actions { flex-direction: column; }
+  .hero__actions .button { flex: none; width: 100%; white-space: nowrap; }
+  .hero__visual { height: 340px; margin-inline: 6px; }
+  .hero__discover { margin-top: 28px; }
+
+  .logo__text { font-size: 21px; }
+  .logo__text > span { font-size: 9.5px; letter-spacing: 3px; }
+  .logo__mark { width: 40px; height: 40px; }
+
+  .product__media { height: 220px; }
+  .product__body { padding: 20px; }
+  .approach__visual { height: 380px; }
+  .approach__phone { width: 220px; }
+  .contact__card { padding: 22px; }
+  .spec-group dl > div { padding-block: 10px; }
+}

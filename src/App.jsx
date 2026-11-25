@@ -78,6 +78,13 @@ function Shop() {
     setLink("alternate", `${SITE_URL}/fr${rest}`, "x-default");
   }, [lang, pathname]);
 
+  // Freeze the page behind the cart drawer / checkout (avoids scroll bleed on phones).
+  useEffect(() => {
+    const locked = cartOpen || checkoutOpen;
+    document.documentElement.classList.toggle("no-scroll", locked);
+    return () => document.documentElement.classList.remove("no-scroll");
+  }, [cartOpen, checkoutOpen]);
+
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import BuyButton from "../components/BuyButton";
 import Reveal from "../components/Reveal";
@@ -22,10 +22,13 @@ export function NotFound() {
 
 export default function ProductPage({ onAdd }) {
   const { id } = useParams();
-  const { t, to, price, products, findProduct } = useI18n();
+  const { t, to, price, products, findProduct, dir } = useI18n();
   const d = t.pdp;
   const p = findProduct(id);
   const [active, setActive] = useState(0);
+  const [showBar, setShowBar] = useState(false);
+  const actionsRef = useRef(null);
+  const touchX = useRef(null);
 
   // Reset the gallery and the tab title when switching product or language.
   useEffect(() => {
@@ -36,7 +39,32 @@ export default function ProductPage({ onAdd }) {
     };
   }, [id, p, t]);
 
+  // Phones: show a sticky buy bar once the main buttons have scrolled out of view.
+  useEffect(() => {
+    const el = actionsRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setShowBar(!e.isIntersecting && e.boundingClientRect.top < 0));
+    io.observe(el);
+    return () => io.disconnect();
+  }, [id]);
+  useEffect(() => {
+    document.documentElement.classList.toggle("has-buybar", showBar);
+    return () => document.documentElement.classList.remove("has-buybar");
+  }, [showBar]);
+
   if (!p) return <NotFound />;
+
+  // Swipe left/right on the main photo (mirrored in Arabic).
+  const count = p.images.length;
+  const onTouchStart = (e) => (touchX.current = e.touches[0].clientX);
+  const onTouchEnd = (e) => {
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) < 40 || count < 2) return;
+    const step = (dx < 0 ? 1 : -1) * (dir === "rtl" ? -1 : 1);
+    setActive((a) => (a + step + count) % count);
+  };
 
   const others = products.filter((x) => x.id !== p.id);
   const discount = p.price != null && p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
@@ -56,9 +84,24 @@ export default function ProductPage({ onAdd }) {
 
           <div className="pdp__grid">
             <div className="gallery anim-in-left">
-              <div className="gallery__main">
+              <div className="gallery__main" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
                 {p.featured && <span className="product__tag">{t.products.popular}</span>}
-                <img key={active} className="gallery__img" src={p.images[active]} alt={d.photo(p.name, active + 1)} />
+                <img
+                  key={active}
+                  className="gallery__img"
+                  src={p.images[active]}
+                  alt={d.photo(p.name, active + 1)}
+                  width="1000"
+                  height="1000"
+                  draggable="false"
+                />
+                {count > 1 && (
+                  <div className="gallery__dots" aria-hidden="true">
+                    {p.images.map((_, i) => (
+                      <span key={i} className={i === active ? "active" : ""} />
+                    ))}
+                  </div>
+                )}
               </div>
               {p.images.length > 1 && (
                 <div className="gallery__thumbs">
@@ -69,7 +112,7 @@ export default function ProductPage({ onAdd }) {
                       onClick={() => setActive(i)}
                       aria-label={d.showPhoto(i + 1)}
                     >
-                      <img src={src} alt="" loading="lazy" />
+                      <img src={src} alt="" loading="lazy" width="120" height="120" />
                     </button>
                   ))}
                 </div>
@@ -104,7 +147,7 @@ export default function ProductPage({ onAdd }) {
                 ))}
               </ul>
 
-              <div className="pdp__actions">
+              <div className="pdp__actions" ref={actionsRef}>
                 <BuyButton product={p} onAdd={onAdd} />
                 <WhatsAppLink className="button button--outline" message={t.wa.question(p.name)}>
                   {d.ask}
@@ -173,7 +216,8 @@ export default function ProductPage({ onAdd }) {
                   {rows.map(([label, value]) => (
                     <div key={label}>
                       <dt>{label}</dt>
-                      <dd>{value}</dd>
+                      {/* dir="auto": technical values like "-20 °C – 75 °C" stay in the right order in Arabic */}
+                      <dd dir="auto">{value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -201,6 +245,15 @@ export default function ProductPage({ onAdd }) {
           </div>
         </section>
       )}
+      {/* ---------- Sticky buy bar (phones) ---------- */}
+      <div className={`buybar${showBar ? " show" : ""}`} aria-hidden={!showBar}>
+        <img src={p.images[0]} alt="" width="44" height="44" />
+        <div className="buybar__info">
+          <strong>{p.name.replace("MiCODUS ", "")}</strong>
+          <span className="num">{p.price != null ? price(p.price) : t.products.onRequest}</span>
+        </div>
+        <BuyButton product={p} onAdd={onAdd} className="button--small" />
+      </div>
     </>
   );
 }

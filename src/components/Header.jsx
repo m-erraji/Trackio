@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import { BagIcon, PhoneIcon } from "./icons";
@@ -32,12 +32,12 @@ export function TopBar() {
 }
 
 /** FR · ع · EN — keeps the current page and section when switching. */
-export function LangSwitch() {
+export function LangSwitch({ className = "", onPick }) {
   const { lang, t } = useI18n();
   const { pathname, hash } = useLocation();
   const rest = pathname.replace(/^\/[^/]+/, "");
   return (
-    <div className="lang-switch" role="group" aria-label={t.header.language}>
+    <div className={`lang-switch ${className}`.trim()} role="group" aria-label={t.header.language}>
       {Object.entries(LANGS).map(([code, L]) => (
         <Link
           key={code}
@@ -48,7 +48,10 @@ export function LangSwitch() {
           aria-label={L.name}
           aria-current={code === lang ? "true" : undefined}
           className={`lang-switch__item${code === lang ? " active" : ""}`}
-          onClick={() => rememberLang(code)}
+          onClick={() => {
+            rememberLang(code);
+            onPick?.();
+          }}
         >
           {L.label}
         </Link>
@@ -62,6 +65,7 @@ export default function Header({ cartCount, bumpKey, onOpenCart }) {
   const nav = useNav();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -70,8 +74,22 @@ export default function Header({ cartCount, bumpKey, onOpenCart }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Mobile menu: lock page scroll while open, close on outside tap.
+  useEffect(() => {
+    document.documentElement.classList.toggle("menu-open", menuOpen);
+    if (!menuOpen) return;
+    const onDown = (e) => {
+      if (!headerRef.current?.contains(e.target)) setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.documentElement.classList.remove("menu-open");
+    };
+  }, [menuOpen]);
+
   return (
-    <header className={`header${scrolled ? " scrolled" : ""}`}>
+    <header ref={headerRef} className={`header${scrolled ? " scrolled" : ""}`}>
       <div className="container header__inner">
         <Logo />
 
@@ -81,6 +99,8 @@ export default function Header({ cartCount, bumpKey, onOpenCart }) {
               {label}
             </Link>
           ))}
+          {/* On phones the language switch lives inside the menu */}
+          <LangSwitch className="nav__lang" onPick={() => setMenuOpen(false)} />
         </nav>
 
         <div className="header__actions">
@@ -88,7 +108,7 @@ export default function Header({ cartCount, bumpKey, onOpenCart }) {
             <PhoneIcon />
             <span className="num" dir="ltr">{PHONE_DISPLAY}</span>
           </a>
-          <LangSwitch />
+          <LangSwitch className="header__lang" />
           <button className="cart-btn" aria-label={t.header.openCart} onClick={onOpenCart}>
             <BagIcon />
             {/* Changing `key` remounts the badge, restarting the bump animation. */}

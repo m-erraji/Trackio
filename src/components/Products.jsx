@@ -13,7 +13,7 @@ export function ProductCard({ product: p, index, onAdd, delay = 0 }) {
         {p.featured && <span className="product__tag">{t.products.popular}</span>}
         {index != null && <span className="product__index">{String(index + 1).padStart(2, "0")}</span>}
         {p.images?.length ? (
-          <img className="product__img" src={p.images[0]} alt={p.name} loading="lazy" />
+          <img className="product__img" src={p.images[0]} alt={p.name} loading="lazy" decoding="async" width="1000" height="1000" />
         ) : (
           <DeviceSVG />
         )}
