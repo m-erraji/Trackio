@@ -1,0 +1,116 @@
+/* =========================================================
+   Trackio — languages
+   1. Language switcher
+   2. Arabic typography
+   3. Right-to-left (RTL) mirroring for Arabic
+   ========================================================= */
+
+/* ---------- 1. Language switcher ---------- */
+.lang-switch { display: inline-flex; align-items: center; gap: 2px; padding: 3px; background: #fff; border: 1px solid var(--c-line); border-radius: 999px; }
+.lang-switch__item {
+  display: grid; place-items: center; min-width: 32px; height: 30px; padding: 0 9px; border-radius: 999px;
+  color: var(--c-muted); font-size: 12px; font-weight: 700; letter-spacing: .5px; text-decoration: none;
+  transition: background .25s, color .25s, transform .2s;
+}
+.lang-switch__item:hover { color: var(--c-accent); }
+.lang-switch__item:active { transform: scale(.92); }
+.lang-switch__item.active { background: var(--c-accent); color: #fff; }
+.lang-switch__item[lang="ar"] { font-family: var(--font-ar); font-size: 15px; line-height: 1; }
+.footer__bottom { align-items: center; flex-wrap: wrap; gap: 16px; }
+.footer__bottom .lang-switch { background: transparent; }
+
+/* ---------- 2. Arabic typography ---------- */
+:root {
+  --font-ar: "IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
+  --font-ar-title: "Cairo", "IBM Plex Sans Arabic", Tahoma, sans-serif;
+}
+html[lang="ar"] { --font-text: var(--font-ar); --font-title: var(--font-ar-title); }
+/* Arabic letters join together: never letter-space them. */
+html[lang="ar"] body * { letter-spacing: 0 !important; }
+html[lang="ar"] h1, html[lang="ar"] h2 { line-height: 1.45; font-weight: 700; }
+html[lang="ar"] h3 { line-height: 1.5; }
+html[lang="ar"] .eyebrow { font-size: 13px; }
+html[lang="ar"] .topbar { font-size: 12.5px; }
+html[lang="ar"] .hero__image-caption span,
+html[lang="ar"] .footer__hours > span,
+html[lang="ar"] .product__price > div > span,
+html[lang="ar"] .spec-group h3 { font-size: 13px; }
+html[lang="ar"] .product__tag { font-size: 11px; }
+html[lang="ar"] .approach__seal span { font-size: 11px; line-height: 1.6; }
+/* The brand name stays in its Latin typeface. */
+html[lang="ar"] .logo__text { font-family: "Manrope", system-ui, sans-serif; }
+html[lang="ar"] .logo__text > span { font-family: var(--font-ar); font-size: 11px; }
+html[lang="ar"] .pdp__title,
+html[lang="ar"] .product__name { font-family: "Manrope", var(--font-ar-title); }
+
+/* ---------- 3. RTL mirroring ---------- */
+[dir="rtl"] .nav a::after { left: auto; right: 0; }
+[dir="rtl"] .cart-count { right: auto; left: -7px; }
+[dir="rtl"] .scroll-progress { transform-origin: 100% 50%; }
+[dir="rtl"] .eyebrow > span:empty { transform-origin: 100% 50%; }
+
+/* Hero */
+[dir="rtl"] .hero__live { right: auto; left: 24px; }
+[dir="rtl"] .hero__badge { left: auto; right: -35px; }
+[dir="rtl"] .hero__map { border-radius: 6px 120px 6px 6px; }
+[dir="rtl"] .hero__visual::before { inset: 12px 12px -12px -12px; border-radius: 6px 120px 6px 6px; }
+[dir="rtl"] .hero__visual { animation-name: heroVisualRtl; }
+@keyframes heroVisualRtl { from { opacity: 0; transform: translateX(-40px) scale(.97); } }
+@media (max-width: 1100px) { [dir="rtl"] .hero__badge { right: -12px; } }
+
+/* Arrows point the other way */
+[dir="rtl"] .icon-arrow { transform: scaleX(-1); }
+[dir="rtl"] .button:hover .icon-arrow { transform: scaleX(-1) translateX(3px); }
+[dir="rtl"] .button:hover svg:not(.icon-arrow) { transform: translateX(-3px); }
+[dir="rtl"] .product__more .arrow { display: inline-block; transform: scaleX(-1); }
+
+/* Products */
+[dir="rtl"] .product__tag { left: auto; right: 16px; }
+[dir="rtl"] .product__index { right: auto; left: 18px; }
+[dir="rtl"] .product:hover .product__img { transform: scale(1.07) rotate(1.5deg); }
+[dir="rtl"] .product__more:hover { transform: translateX(-4px); }
+
+/* Approach */
+[dir="rtl"] .approach__visual { border-radius: 90px 6px 6px 6px; }
+[dir="rtl"] .approach__seal { right: auto; left: 20px; }
+
+/* Steps, FAQ, contact, footer — hover nudges go the other way */
+[dir="rtl"] .steps li:hover .step__num { transform: translateX(-6px); }
+[dir="rtl"] .faq summary:hover { padding-left: 0; padding-right: 6px; }
+[dir="rtl"] .faq summary { transition: color .2s, padding-right .3s var(--ease-out); }
+[dir="rtl"] .faq__answer { padding: 0 0 24px 28px; }
+[dir="rtl"] .contact__list > div:hover { padding-left: 0; padding-right: 6px; }
+[dir="rtl"] .contact__list > div { transition: padding-right .3s var(--ease-out); }
+[dir="rtl"] .footer__nav a:hover { transform: translateX(-4px); }
+[dir="rtl"] .pdp__docs a:hover { transform: translateX(-4px); }
+
+/* Scroll reveals & entrances slide from the mirrored side */
+[dir="rtl"] .reveal--left { transform: translateX(40px); }
+[dir="rtl"] .reveal--right { transform: translateX(-40px); }
+[dir="rtl"] .reveal.visible { transform: none; }
+[dir="rtl"] .anim-in-left { animation-name: fadeRight; }
+@keyframes fadeRight { from { opacity: 0; transform: translateX(36px); } }
+
+/* WhatsApp button, cart drawer, modal */
+[dir="rtl"] .wa-fab { right: auto; left: 22px; }
+[dir="rtl"] .drawer { right: auto; left: 0; transform: translateX(-100%); box-shadow: 10px 0 40px #2a232620; }
+[dir="rtl"] .drawer.open { transform: none; }
+[dir="rtl"] .drawer.open .cart-item { animation-name: slideInLeft; }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } }
+[dir="rtl"] .modal__close { right: auto; left: 16px; }
+
+/* ---------- Header fit: longer FR / AR labels stay on one line ---------- */
+.nav a, .header__phone, .header__actions .button { white-space: nowrap; }
+@media (max-width: 1440px) {
+  .header__phone { display: none; }
+  .nav { gap: 26px; }
+  .header__actions { gap: 14px; }
+}
+@media (max-width: 1180px) {
+  .nav { gap: 18px; }
+  .nav a { font-size: 13px; }
+}
+
+/* Elements waiting to slide in from the side must never widen the page
+   (would allow sideways scrolling on phones, and shift RTL pages). */
+main, footer { overflow-x: clip; }
