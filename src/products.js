@@ -21,7 +21,7 @@ export const PRODUCTS = [
     id: "mv710n",
     name: "MiCODUS MV710N",
     tagline: "Wired · 2G · door alarm & fuel cut-off",
-    price: null, // TODO: set your price
+    price: 500, // TODO: set your price
     oldPrice: null,
     images: gallery("mv710n", 5),
     specs: [
@@ -86,8 +86,8 @@ export const PRODUCTS = [
     id: "ml920g",
     name: "MiCODUS ML920G",
     tagline: "Magnetic · 4G LTE · 20,000 mAh",
-    price: 1699, // TODO: confirm your price
-    oldPrice: 2199,
+    price: 1200, // TODO: confirm your price
+    oldPrice: 1700,
     featured: true,
     images: gallery("ml920g", 5),
     specs: [

@@ -11,6 +11,7 @@ import CheckoutModal from "./components/CheckoutModal";
 import { useCart } from "./hooks/useCart";
 import { useToast } from "./hooks/useToast";
 import { I18nProvider, LANGS, detectLang, rememberLang, useI18n } from "./i18n";
+import { SITE_URL } from "./site";
 
 /* URLs: /fr/…, /ar/…, /en/…  —  "/" and unprefixed URLs redirect to the visitor's language. */
 export default function App() {
@@ -57,6 +58,25 @@ function Shop() {
     document.querySelector('meta[name="description"]')?.setAttribute("content", t.meta.description);
     rememberLang(lang);
   }, [lang, dir, t]);
+
+  // SEO: canonical URL + links to the same page in the other languages.
+  useEffect(() => {
+    const rest = pathname.replace(/^\/[^/]+/, "");
+    const setLink = (rel, href, hreflang) => {
+      const sel = hreflang ? `link[rel="${rel}"][hreflang="${hreflang}"]` : `link[rel="${rel}"]:not([hreflang])`;
+      let el = document.head.querySelector(sel);
+      if (!el) {
+        el = document.createElement("link");
+        el.rel = rel;
+        if (hreflang) el.hreflang = hreflang;
+        document.head.appendChild(el);
+      }
+      el.href = href;
+    };
+    setLink("canonical", `${SITE_URL}/${lang}${rest}`);
+    Object.keys(LANGS).forEach((l) => setLink("alternate", `${SITE_URL}/${l}${rest}`, l));
+    setLink("alternate", `${SITE_URL}/fr${rest}`, "x-default");
+  }, [lang, pathname]);
 
   useEffect(() => {
     const onKey = (e) => {
